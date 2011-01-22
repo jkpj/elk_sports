@@ -17,7 +17,7 @@ group :development, :test do
   gem 'gherkin', '>=2.2.9'
   gem 'cucumber-rails', '>=0.3.2'
   gem 'cucumber', '>=0.9.2'
-  gem 'spork'
+#  gem 'spork'
   gem 'launchy'    # So you can do Then show me the page
   gem 'shoulda'
   gem 'email_spec'
