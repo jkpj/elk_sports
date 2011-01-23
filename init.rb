@@ -4,4 +4,6 @@ at_exit do
   #require "sqlite"
 end
 
-system "rails", "server" unless ENV['BUILD_EXE']
+unless defined?(Ocra)
+  system "rails", "server"
+end
