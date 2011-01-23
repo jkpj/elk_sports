@@ -5,5 +5,5 @@ at_exit do
 end
 
 unless defined?(Ocra)
-  system "rails", "server"
+  system "ruby", "script/rails", "server"
 end
