@@ -5,5 +5,6 @@ at_exit do
 end
 
 unless defined?(Ocra)
-  system "ruby", "script/rails", "server"
+  p "KAYNNISTETAAN HIRVIURHEILU..."
+  load "script/winoffline.rb"
 end
