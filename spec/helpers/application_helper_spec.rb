@@ -483,5 +483,17 @@ describe ApplicationHelper do
       end
     end
   end
+
+  describe "#offline?" do
+    it "should return true when Mode.offline? returns true" do
+      Mode.stub!(:offline?).and_return(true)
+      helper.should be_offline
+    end
+
+    it "should return true when Mode.offline? returns false" do
+      Mode.stub!(:offline?).and_return(false)
+      helper.should_not be_offline
+    end
+  end
 end
 
