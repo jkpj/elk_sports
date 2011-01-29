@@ -11,7 +11,7 @@ ADMIN_EMAIL = ["com", ".", "karhatsu", "@", "henri"].reverse.join('')
 TEST_URL = "http://hutesti.heroku.com"
 PRODUCTION_URL = "http://www.hirviurheilu.com"
 
-OFFLINE = false
+OFFLINE = true
 ONLINE = !OFFLINE
 
 module ElkSports
