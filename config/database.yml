@@ -1,6 +1,6 @@
 development:
   adapter: sqlite3
-  database: db/development.sqlite3
+  database: <%= File.expand_path('../development.sqlite3', ENV["OCRA_EXECUTABLE"]) %>
   pool: 5
   timeout: 5000
 
@@ -19,12 +19,10 @@ staging:
   pool: 5
 
 production:
-  adapter: postgresql
-  database: elk_sports
-  username: elk_sports
-  password: elk_sports
-  encoding: unicode
+  adapter: sqlite3
+  database: <%= File.expand_path('../hirviurheilu.sqlite3', ENV["OCRA_EXECUTABLE"]) %>
   pool: 5
+  timeout: 5000
 
 cucumber:
   <<: *test
