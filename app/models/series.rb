@@ -9,9 +9,10 @@ class Series < ActiveRecord::Base
     :conditions => "start_time is not null", :order => "start_time"
 
   accepts_nested_attributes_for :age_groups, :allow_destroy => true
+  accepts_nested_attributes_for :competitors
 
   validates :name, :presence => true
-  validates :race, :presence => true
+  #validates :race, :presence => true
   validates :first_number, :numericality => { :only_integer => true,
     :allow_nil => true, :greater_than => 0 }
   validates :start_day, :numericality => { :only_integer => true,

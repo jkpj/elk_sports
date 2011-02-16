@@ -53,6 +53,9 @@ ElkSports::Application.routes.draw do
       resources :quick_saves
       resources :media
       resource :finish_race
+      resource :uploads
+      get 'upload/success' => 'uploads#success'
+      get 'upload/error' => 'uploads#error'
     end
 
     resources :series do
@@ -66,6 +69,8 @@ ElkSports::Application.routes.draw do
     
     root :to => "index#show"
   end
+
+  resources :remote_races
 
   root :to => "home#show"
 end

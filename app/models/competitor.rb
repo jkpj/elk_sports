@@ -9,10 +9,10 @@ class Competitor < ActiveRecord::Base
 
   accepts_nested_attributes_for :shots, :allow_destroy => true
 
-  validates :series, :presence => true
+  #validates :series, :presence => true
   validates :first_name, :presence => true
   validates :last_name, :presence => true
-  validates :club, :presence => true
+  #validates :club, :presence => true
   validates :number,
     :numericality => { :only_integer => true, :greater_than => 0, :allow_nil => true },
     :uniqueness => { :scope => :series_id, :allow_nil => true }
@@ -40,6 +40,8 @@ class Competitor < ActiveRecord::Base
   validate :max_ten_shots
   validate :check_no_result_reason
   validate :check_if_series_has_start_list
+
+  attr_accessor :club_name, :age_group_name
 
   def shot_values
     values = shots.collect do |s|
