@@ -50,5 +50,15 @@ module ElkSports
     config.generators do |g|
       g.test_framework :rspec
     end
+    
+    module ServerStartInfo
+      def self.call
+        p ""
+        p "HIRVIURHEILU OFFLINE ON NYT VALMIS KAYTETTAVAKSI"
+        p "Jos Windows kysyy erillista lupaa ohjelman kayttoon, salli kaytto."
+        p "Sen jalkeen avaa selain (esim. Internet Explorer tai Firefox)"
+        p "ja mene osoitteeseen http://localhost:3000"
+      end
+    end
   end
 end
