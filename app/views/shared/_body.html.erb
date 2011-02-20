@@ -1,4 +1,7 @@
 <body>
+  <% unless ActivationKey.activated? %>
+    <%= render :partial => 'shared/offline_limit' %>
+  <% end %>
   <div class="header">
     <%= render :partial => 'shared/menu' %>
     <%= render :partial => 'shared/env_info' %>

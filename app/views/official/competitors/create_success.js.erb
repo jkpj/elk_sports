@@ -1,6 +1,9 @@
 $('#spinner').hide();
 $('div.error').hide();
 
+$('#free_offline_competitors_left').text('<%= t 'count_competitors',
+  :count => Competitor.free_offline_competitors_left %>');
+
 $('#competitor_first_name').val('');
 $('#competitor_last_name').val('');
 $('#club').next().val('');

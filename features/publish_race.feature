@@ -27,9 +27,11 @@ Feature: Publish race
   # The second user is meant for receiving the uploaded race.
   Scenario: Publish finished race
     Given there is an official with email "offline@hirviurheilu.com" and password "offline"
-    Given there is an official with email "online@hirviurheilu.com" and password "online"
+    Given there is an official "Robert" "Onliner" with email "online@hirviurheilu.com" and password "online"
     Given I use the software offline
-    And I have an ongoing race "Offline race"
+    And I have an ongoing race with attributes:
+      | name | Offline race |
+      | location | Offline city |
     And the race has a club "Offline club"
     And the race has series with attributes:
       | name | Offline series |
@@ -75,6 +77,11 @@ Feature: Publish race
     And I select "Integration test" from "Kohde"
     And I press "Julkaise"
     Then I should see "Kilpailun tiedot ladattu kohdejärjestelmään" within "div.success"
+    And the admin should receive an email
+    When I open the email
+    Then I should see "Hirviurheilu - kilpailu julkaistu (test)" in the email subject
+    And I should see "Julkaistu kilpailu: Offline race (Offline city)" in the email body
+    And I should see "Toimitsija: Robert Onliner" in the email body
     Given I use the software online again
     And I am on the home page
     And I follow "Kirjaudu sisään"
@@ -88,7 +95,8 @@ Feature: Publish race
     Then I should see "Offline series"
     But I should not see "kun kaikki tulokset on syötetty"
     When I follow "Kilpailu & sarjat"
-    Then the "Nimi" field should contain "Offline age group"
+    Then the "Paikkakunta" field should contain "Offline city"
+    And the "Nimi" field should contain "Offline age group"
     When I follow "Seurat"
     Then I should see "Offline club"
     When I follow "Oikeat arviot"
@@ -125,34 +133,21 @@ Feature: Publish race
   Scenario: Try to publish with invalid account
     Given there is an official with email "offline@hirviurheilu.com" and password "offline"
     Given I use the software offline
-    And I have an ongoing race "Offline race"
-    And the race has a club "Offline club"
-    And the race has series with attributes:
-      | name | Offline series |
-      | first_number | 15 |
-      | start_time | 13:00 |
-    And the series has an age group "Offline age group"
-    And the race has correct estimates with attributes:
-      | min_number | 15 |
-      | max_number | 16 |
-      | distance1 | 110 |
-      | distance2 | 130 |
-    And the series has a competitor with attributes:
-      | first_name | James |
-      | last_name | Johnson |
-      | club | Offline club |
-    And the start list has been generated for the series
-    And the competitor "James" "Johnson" has the following results:
-      | shots_total_input | 85 |
-      | estimate1 | 111 |
-      | estimate2 | 129 |
-      | arrival_time | 14:10:25 |
-    And the race is finished
-    And I am on the official race page of "Offline race"
-    And I follow "Julkaise"
-    Then I should be on the publish race page of "Offline race"
+    And I have a complete race "Offline race" located in "Offline city"
+    And I am on the publish race page of "Offline race"
     When I fill in "wrong@email.com" for "Sähköposti"
     And I fill in "wrong password" for "Salasana"
     And I select "Integration test" from "Kohde"
     And I press "Julkaise"
-    And I should see "Virheelliset tunnukset" within "div.error"
+    Then I should see "Virheelliset tunnukset" within "div.error"
+
+  Scenario: Try to publish same race twice
+    Given there is an official with email "offline@hirviurheilu.com" and password "offline"
+    Given I use the software offline
+    And I have a complete race "Offline race" located in "Offline city"
+    And I am on the publish race page of "Offline race"
+    When I fill in "offline@hirviurheilu.com" for "Sähköposti"
+    And I fill in "offline" for "Salasana"
+    And I select "Integration test" from "Kohde"
+    And I press "Julkaise"
+    Then I should see "Järjestelmästä löytyy jo kilpailu, jolla on sama nimi, sijainti ja päivämäärä" within "div.error"

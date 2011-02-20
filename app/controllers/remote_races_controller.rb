@@ -6,6 +6,7 @@ class RemoteRacesController < ApplicationController
   def create
     if @race.save
       @user.races << @race
+      PublishMailer.publish_mail(@race, @user).deliver
       redirect_to_success
     else
       redirect_to_error @race.errors.full_messages.join('. ') + '.'
@@ -22,16 +23,28 @@ class RemoteRacesController < ApplicationController
   end
 
   def prepare_clubs_for_competitors
-    save_race_without_children # in order to get an id for the race
-    include_children_to_saved_race
-    club_names_ids = save_clubs
-    set_club_ids_for_competitors(club_names_ids)
+    if save_race_without_children # in order to get an id for the race
+      include_children_to_saved_race
+      club_names_ids = save_clubs
+      set_club_ids_for_competitors(club_names_ids)
+    end
   end
 
   def save_race_without_children
     @race = Race.new(params[:race])
+    rename_race
     @race = Race.new(@race.attributes) # no children in @race
-    @race.save!
+    unless @race.save
+      redirect_to_error @race.errors.full_messages.join('. ') + '.'
+      return false
+    end
+    true
+  end
+
+  def rename_race
+    if Rails.env == 'development' and params[:rename_race]
+      @race.name += " #{Time.now.strftime('%Y%m%d-%H%M%S')}"
+    end
   end
 
   def include_children_to_saved_race
