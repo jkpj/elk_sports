@@ -1,5 +1,5 @@
-exe_path = Rails.env == 'production' || Rails.env == 'staging' ?
-  Rails.root.join('bin', 'wkhtmltopdf-amd64').to_s : '/usr/bin/wkhtmltopdf'
+exe_path = Rails.root.join('bin', 'wkhtmltopdf.exe').to_s
+p exe_path
 WICKED_PDF = {
   #:wkhtmltopdf => '/usr/local/bin/wkhtmltopdf',
   #:layout => "pdf.html",
