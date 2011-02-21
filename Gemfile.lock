@@ -65,6 +65,8 @@ GEM
     treetop (1.4.9)
       polyglot (>= 0.3.1)
     tzinfo (0.3.23)
+    win32-open3 (0.3.2)
+    win32-open3 (0.3.2-x86-mingw32)
 
 PLATFORMS
   ruby
@@ -73,3 +75,4 @@ PLATFORMS
 DEPENDENCIES
   rails (= 3.0.3)
   sqlite3-ruby
+  win32-open3

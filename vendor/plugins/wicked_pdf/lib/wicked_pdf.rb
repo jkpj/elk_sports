@@ -3,7 +3,7 @@
 
 require 'logger'
 require 'digest/md5'
-require 'open3'
+require 'win32/open3'
 
 class WickedPdf
   def initialize(wkhtmltopdf_binary_path = nil)
