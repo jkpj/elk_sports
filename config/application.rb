@@ -60,5 +60,12 @@ module ElkSports
         p "ja mene osoitteeseen http://localhost:3000"
       end
     end
+    
+    module ServerStopInfo
+      def self.call
+        p ""
+        p "SULJETAAN HIRVIURHEILU OFFLINE, ODOTA HETKI..."
+      end
+    end
   end
 end
