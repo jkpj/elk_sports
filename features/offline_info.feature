@@ -18,6 +18,10 @@ Feature: Offline info
     Then I should be on the home page
     When I go to the offline price page
     Then I should be on the home page
+    
+  Scenario: Default offline path
+    Given I go to the offline page
+    Then I should be on the offline-online comparison page
 
   Scenario: Show online vs. offline comparison
     Given I am on the home page
@@ -28,12 +32,24 @@ Feature: Offline info
     And I should see "Hirviurheilu Online vai Hirviurheilu Offline?" within "div.main_title"
 
   Scenario: Offline installation instructions
-    Given I am on the offline-online comparison page
+    Given I am an official with email "test@test.com" and password "test"
+    And I am on the offline-online comparison page
     When I follow "Katso Hirviurheilu Offline -tuotteen asennusohjeet."
     Then I should be on the offline installation page
     And the "Offline" main menu item should be selected
     And the "Offline-asennus" sub menu item should be selected
     And I should see "Hirviurheilu Offline -tuotteen asennusohjeet" within "div.main_title"
+    And I should see "Kun olet kirjautunut palveluun, tähän ilmestyy latauslinkki." within "div.info"
+    But I should not see "lataa asennustiedosto"
+    And I should not see "lataa päivitystiedosto"
+    When I follow "kirjaudu sisään palveluun"
+    And I fill in "test@test.com" for "Sähköposti"
+    And I fill in "test" for "Salasana"
+    And I press "Kirjaudu"
+    Then I should be on the offline installation page
+    And I should see "lataa asennustiedosto"
+    And I should see "lataa päivitystiedosto"
+    But I should not see "Kun olet kirjautunut palveluun, tähän ilmestyy latauslinkki."
 
   Scenario: Show offline price
     Given I am on the offline installation page
