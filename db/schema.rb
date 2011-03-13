@@ -137,11 +137,11 @@ ActiveRecord::Schema.define(:version => 20110313121158) do
   add_index "relay_competitors", ["relay_team_id"], :name => "index_relay_competitors_on_relay_team_id"
 
   create_table "relay_correct_estimates", :force => true do |t|
-    t.integer  "relay_id",   :null => false
+    t.integer  "relay_id",                  :null => false
     t.integer  "distance"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "leg",        :null => false
+    t.integer  "leg",        :default => 1, :null => false
   end
 
   add_index "relay_correct_estimates", ["relay_id"], :name => "index_relay_correct_estimates_on_relay_id"
