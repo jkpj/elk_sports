@@ -38,8 +38,17 @@ module NavigationHelpers
     when /the invite officials page for "(.*)"/
       official_race_invite_officials_path(Race.find_by_name($1))
 
-    when /the publish race page of "(.*)"/
-      new_official_race_uploads_path(Race.find_by_name($1))
+    when /the export race page of "(.*)"/
+      new_official_race_exports_path(Race.find_by_name($1))
+
+    when /the official relays page of "(.*)"/
+      official_race_relays_path(Race.find_by_name($1))
+
+    when /the edit relay page of "(.*)"/
+      edit_official_race_relay_path(Relay.find_by_name($1).race, Relay.find_by_name($1))
+
+    when /the finish relay page of "(.*)"/
+      new_official_relay_finish_relay_path(Relay.find_by_name($1).race)
 
     when /the race page/
       race_path(@race)
@@ -52,6 +61,9 @@ module NavigationHelpers
 
     when /the start list page of the series/
       series_start_list_path(@series)
+
+    when /the relay results page of "(.*)"/
+      race_relay_path(Relay.find_by_name($1).race, Relay.find_by_name($1))
 
     when /the registration page/
       register_path

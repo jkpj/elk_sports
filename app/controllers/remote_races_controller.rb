@@ -6,7 +6,9 @@ class RemoteRacesController < ApplicationController
   def create
     if @race.save
       @user.races << @race
-      PublishMailer.publish_mail(@race, @user).deliver
+      unless offline_or_fake_offline?
+        PublishMailer.publish_mail(@race, @user).deliver
+      end
       redirect_to_success
     else
       redirect_to_error @race.errors.full_messages.join('. ') + '.'
@@ -15,11 +17,20 @@ class RemoteRacesController < ApplicationController
 
   private
   def check_user
-    @user = User.find_by_email(params[:email])
-    unless @user and @user.valid_password?(params[:password])
-      redirect_to_error "Virheelliset tunnukset. " +
-        "Varmista että olet syöttänyt palvelun #{params[:server]} tunnukset."
+    if offline_or_fake_offline?
+      @user = User.first
+    else
+      @user = User.find_by_email(params[:email])
+      unless @user and @user.valid_password?(params[:password])
+        redirect_to_error "Virheelliset tunnukset. " +
+          "Varmista että olet syöttänyt palvelun #{params[:server]} tunnukset."
+      end
     end
+  end
+
+  def offline_or_fake_offline?
+    # this hack is for cucumber features
+    (offline? and Rails.env != 'test') or (online? and Rails.env == 'test')
   end
 
   def prepare_clubs_for_competitors
@@ -32,19 +43,12 @@ class RemoteRacesController < ApplicationController
 
   def save_race_without_children
     @race = Race.new(params[:race])
-    rename_race
     @race = Race.new(@race.attributes) # no children in @race
     unless @race.save
       redirect_to_error @race.errors.full_messages.join('. ') + '.'
       return false
     end
     true
-  end
-
-  def rename_race
-    if Rails.env == 'development' and params[:rename_race]
-      @race.name += " #{Time.now.strftime('%Y%m%d-%H%M%S')}"
-    end
   end
 
   def include_children_to_saved_race
@@ -83,12 +87,14 @@ class RemoteRacesController < ApplicationController
   end
 
   def redirect_to_success
-    redirect_to "#{params[:source]}/official/races/#{params[:source_race_id]}/upload/success"
+    redirect_to "#{params[:source]}/official/races/#{params[:source_race_id]}/export/success"
   end
 
   def redirect_to_error(message)
-    redirect_to "#{params[:source]}/official/races/#{params[:source_race_id]}/upload/error?" +
-        "message=#{CGI::escape(message)}&server=#{CGI::escape(params[:server])}" +
-        "&email=#{CGI::escape(params[:email])}"
+    path = "#{params[:source]}/official/races/#{params[:source_race_id]}/export/error?" +
+        "message=#{CGI::escape(message)}"
+    path << "&server=#{CGI::escape(params[:server])}" if params[:server]
+    path << "&email=#{CGI::escape(params[:email])}" if params[:email]
+    redirect_to path
   end
 end

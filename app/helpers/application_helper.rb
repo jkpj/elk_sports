@@ -53,10 +53,18 @@ module ApplicationHelper
   end
 
   def points_print(competitor)
-    return competitor.no_result_reason if competitor.no_result_reason
+    if competitor.no_result_reason
+      return no_result_reason_print(competitor.no_result_reason)
+    end
     return competitor.points unless competitor.points.nil?
     return "(#{competitor.points!})" unless competitor.points!.nil?
     "-"
+  end
+
+  def no_result_reason_print(no_result_reason, scope='competitor')
+    "<span class='explanation' " +
+      "title='#{t(scope + '.' + no_result_reason)}'>" +
+      "#{no_result_reason}</span>"
   end
 
   def time_from_seconds(seconds)
@@ -181,12 +189,12 @@ module ApplicationHelper
 
   # -- Form child functions --
   def remove_child_link(name, f, hide_class, confirm_question)
-    f.hidden_field(:_destroy) + link_to_function(name, "remove_fields(this, '#{hide_class}', '#{confirm_question}')")
+    f.hidden_field(:_destroy) + button_to_function(name, "remove_fields(this, '#{hide_class}', '#{confirm_question}')")
   end
 
   def add_child_link(name, f, method, id=nil)
     fields = new_child_fields(f, method)
-    link_to_function(name, "insert_fields(this, \"#{method}\", \"#{escape_javascript(fields)}\")", :id => id)
+    button_to_function(name, "insert_fields(this, \"#{method}\", \"#{escape_javascript(fields)}\")", :id => id)
   end
 
   def new_child_fields(form_builder, method, index=nil, options = {})
@@ -195,7 +203,8 @@ module ApplicationHelper
     options[:form_builder_local] ||= :f
     index_str = (index ? "_#{index}" : '')
     form_builder.fields_for(method, options[:object], :child_index => "new#{index_str}_#{method}") do |f|
-      render(:partial => options[:partial], :locals => { options[:form_builder_local] => f})
+      render(:partial => options[:partial],
+        :locals => { options[:form_builder_local] => f, :index => index })
     end
   end
   # -- Form child functions (end) --
@@ -235,6 +244,8 @@ module ApplicationHelper
       @race
     elsif @series
       @series.race
+    elsif @relay
+      @relay.race
     elsif @competitor
       @competitor.series.race
     else
@@ -269,6 +280,11 @@ module ApplicationHelper
 
   def youtube_path
     "http://www.youtube.com/watch?v=oRNIy1G4qWM"
+  end
+
+  def link_with_protocol(link)
+    return link if link[0, 7] == 'http://' or link[0, 8] == 'https://'
+    'http://' + link
   end
 
 end

@@ -5,7 +5,8 @@ describe ApplicationHelper do
     it "should print no result reason if it is defined" do
       competitor = mock_model(Competitor, :no_result_reason => Competitor::DNS,
         :points => 145)
-      helper.points_print(competitor).should == Competitor::DNS
+      helper.points_print(competitor).should ==
+        "<span class='explanation' title='Kilpailija ei osallistunut kilpailuun'>DNS</span>"
     end
 
     it "should print points in case they are available" do
@@ -493,6 +494,20 @@ describe ApplicationHelper do
     it "should return true when Mode.offline? returns false" do
       Mode.stub!(:offline?).and_return(false)
       helper.should_not be_offline
+    end
+  end
+
+  describe "#link_with_protocol" do
+    it "should return the given link if it starts with http://" do
+      helper.link_with_protocol('http://www.test.com').should == 'http://www.test.com'
+    end
+
+    it "should return the given link if it starts with https://" do
+      helper.link_with_protocol('https://www.test.com').should == 'https://www.test.com'
+    end
+
+    it "should return http protocol + the given link if the protocol is missing" do
+      helper.link_with_protocol('www.test.com').should == 'http://www.test.com'
     end
   end
 end

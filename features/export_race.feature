@@ -1,16 +1,7 @@
-Feature: Publish race
+Feature: Export race
   In order to let the competitors and anyone who is interested to see the race results
   As a person using the software offline
   I want to publish the finished race to an online service
-
-  Scenario: No publishing in online
-    Given I am an official
-    And I have an ongoing race "Online race"
-    And I have logged in
-    And I am on the official race page of "Online race"
-    Then I should not see "Julkaise"
-    When I go to the publish race page of "Online race"
-    Then I should be on the official race page of "Online race"
 
   Scenario: Unfinished race
     Given I use the software offline
@@ -22,10 +13,10 @@ Feature: Publish race
     And I should see "Tällä sivulla voit julkaista kilpailun lopulliset tulokset internetissä, Hirviurheilu-palvelussa." within "div.info"
     And I should see "Voit julkaista kilpailun vasta, kun olet merkinnyt sen päättyneeksi." within "div.error"
 
-  # In this scenario the race is published to the same system which is relevant only for testing.
+  # In this scenario the race is exported to the same system which is relevant only for testing.
   # The first user in the scenario is automatically used in the offline state.
   # The second user is meant for receiving the uploaded race.
-  Scenario: Publish finished race
+  Scenario: Export finished race from offline to online
     Given there is an official with email "offline@hirviurheilu.com" and password "offline"
     Given there is an official "Robert" "Onliner" with email "online@hirviurheilu.com" and password "online"
     Given I use the software offline
@@ -66,13 +57,12 @@ Feature: Publish race
     And the race is finished
     And I am on the official race page of "Offline race"
     And I follow "Julkaise"
-    Then I should be on the publish race page of "Offline race"
+    Then I should be on the export race page of "Offline race"
     But I should not see "Voit julkaista kilpailun vasta, kun olet merkinnyt sen päättyneeksi."
-    And I should see "Julkaistava kilpailu: Offline race"
-    # hack for duplicate name-location-date problem in saving
-    # the form has the old name (Offline race) but in the db there is no race with such name
-    Given the race "Offline race" is renamed to "Original race"
-    When I fill in "online@hirviurheilu.com" for "Sähköposti"
+    But I should not see "Jos sinulla on Hirviurheilu Offline"
+    And the "Kilpailun nimi" field should contain "Offline race"
+    When I fill in "New name for race" for "Kilpailun nimi"
+    And I fill in "online@hirviurheilu.com" for "Sähköposti"
     And I fill in "online" for "Salasana"
     And I select "Integration test" from "Kohde"
     And I press "Julkaise"
@@ -80,7 +70,7 @@ Feature: Publish race
     And the admin should receive an email
     When I open the email
     Then I should see "Hirviurheilu - kilpailu julkaistu (test)" in the email subject
-    And I should see "Julkaistu kilpailu: Offline race (Offline city)" in the email body
+    And I should see "Julkaistu kilpailu: New name for race (Offline city)" in the email body
     And I should see "Toimitsija: Robert Onliner" in the email body
     Given I use the software online again
     And I am on the home page
@@ -90,8 +80,7 @@ Feature: Publish race
     And I press "Kirjaudu"
     And I follow "Toimitsijan sivut"
     Then I should be on the official index page
-    And I should see "Offline race"
-    When I follow "Offline race"
+    When I follow "New name for race"
     Then I should see "Offline series"
     But I should not see "kun kaikki tulokset on syötetty"
     When I follow "Kilpailu & sarjat"
@@ -130,24 +119,52 @@ Feature: Publish race
     And the "competitor_shots_attributes_8_value" field should contain "5"
     And the "competitor_shots_attributes_9_value" field should contain "0"
 
-  Scenario: Try to publish with invalid account
+  Scenario: Try to export with invalid account
     Given there is an official with email "offline@hirviurheilu.com" and password "offline"
     Given I use the software offline
     And I have a complete race "Offline race" located in "Offline city"
-    And I am on the publish race page of "Offline race"
+    And I am on the export race page of "Offline race"
     When I fill in "wrong@email.com" for "Sähköposti"
     And I fill in "wrong password" for "Salasana"
     And I select "Integration test" from "Kohde"
     And I press "Julkaise"
     Then I should see "Virheelliset tunnukset" within "div.error"
 
-  Scenario: Try to publish same race twice
+  Scenario: Try to export same race twice without renaming the race
     Given there is an official with email "offline@hirviurheilu.com" and password "offline"
     Given I use the software offline
     And I have a complete race "Offline race" located in "Offline city"
-    And I am on the publish race page of "Offline race"
+    And I am on the export race page of "Offline race"
     When I fill in "offline@hirviurheilu.com" for "Sähköposti"
     And I fill in "offline" for "Salasana"
     And I select "Integration test" from "Kohde"
     And I press "Julkaise"
     Then I should see "Järjestelmästä löytyy jo kilpailu, jolla on sama nimi, sijainti ja päivämäärä" within "div.error"
+
+  # In this scenario the race is exported to the same system which is relevant only for testing.
+  # The first user in the scenario is automatically used in the offline state.
+  # The second user is meant for receiving the uploaded race.
+  Scenario: Export race from online to offline
+    Given there is an official with email "offline@hirviurheilu.com" and password "offline"
+    Given I am an official with email "online@hirviurheilu.com" and password "online"
+    And I have a race "Online race"
+    And the race has series "Online series"
+    And I have logged in
+    And I am on the official race page of "Online race"
+    And I follow "Lataa"
+    Then I should be on the export race page of "Online race"
+    And I should see "Jos sinulla on Hirviurheilu Offline, voit ladata tämän kilpailun omalle koneellesi." within "div.info"
+    But I should not see "Voit julkaista kilpailun vasta, kun olet merkinnyt sen päättyneeksi."
+    And I should not see "Kohde"
+    And I should not see "Sähköposti"
+    And I should not see "Salasana"
+    And the "Kilpailun nimi" field should contain "Online race"
+    When I fill in "Downloaded race" for "Kilpailun nimi"
+    And I press "Lataa"
+    Then I should see "Kilpailun tiedot ladattu omalle koneellesi" within "div.success"
+    But the admin should receive no email
+    Given I use the software offline
+    When I follow "Toimitsijan sivut"
+    Then I should be on the official index page
+    When I follow "Downloaded race"
+    Then I should see "Online series"

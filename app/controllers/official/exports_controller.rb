@@ -1,13 +1,17 @@
-class Official::UploadsController < Official::OfficialController
-  before_filter :define_servers, :set_upload
-  before_filter :assign_race_by_race_id, :check_assigned_race, :check_offline
+class Official::ExportsController < Official::OfficialController
+  before_filter :define_servers, :set_export
+  before_filter :assign_race_by_race_id, :check_assigned_race
 
   def new
   end
 
   def success
-    flash[:success] = 'Kilpailun tiedot ladattu kohdejärjestelmään'
-    redirect_to new_official_race_uploads_path(@race)
+    if offline?
+      flash[:success] = 'Kilpailun tiedot ladattu kohdejärjestelmään'
+    else
+      flash[:success] = 'Kilpailun tiedot ladattu omalle koneellesi'
+    end
+    redirect_to new_official_race_exports_path(@race)
   end
 
   def error
@@ -16,12 +20,8 @@ class Official::UploadsController < Official::OfficialController
   end
 
   private
-  def set_upload
-    @is_upload = true
-  end
-
-  def check_offline
-    redirect_to official_race_path(@race) if online?
+  def set_export
+    @is_export = true
   end
 
   def define_servers

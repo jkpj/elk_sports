@@ -30,11 +30,16 @@ ElkSports::Application.routes.draw do
 
   resources :races do
     resources :team_results
+    resources :relays
   end
 
   resources :series do
     resources :competitors
     resource :start_list
+  end
+
+  resources :relays do
+    resources :legs
   end
 
   namespace :admin do
@@ -62,9 +67,10 @@ ElkSports::Application.routes.draw do
       resources :quick_saves
       resources :media
       resource :finish_race
-      resource :uploads
-      get 'upload/success' => 'uploads#success'
-      get 'upload/error' => 'uploads#error'
+      resource :exports
+      get 'export/success' => 'exports#success'
+      get 'export/error' => 'exports#error'
+      resources :relays
     end
 
     resources :series do
@@ -74,6 +80,18 @@ ElkSports::Application.routes.draw do
       resources :shots
       resources :estimates
       resources :times
+    end
+
+    resources :relays do
+      resources :relay_teams
+      post 'relay_estimate_quick_save' => 'relay_quick_saves#estimate',
+        :as => :relay_estimate_quick_save
+      post 'relay_misses_quick_save' => 'relay_quick_saves#misses',
+        :as => :relay_misses_quick_save
+      post 'relay_time_quick_save' => 'relay_quick_saves#time',
+        :as => :relay_time_quick_save
+      resources :relay_quick_saves
+      resource :finish_relay
     end
     
     root :to => "index#show"
