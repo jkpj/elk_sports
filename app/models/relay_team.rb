@@ -14,7 +14,7 @@ class RelayTeam < ActiveRecord::Base
 
   def time_in_seconds(leg=nil)
     leg = relay.legs_count unless leg
-    competitor = relay_competitors.where(:leg => leg).first
+    competitor = competitor(leg)
     return nil unless competitor and competitor.arrival_time
     competitor.arrival_time - relay.start_time + adjustment(leg)
   end
@@ -30,8 +30,9 @@ class RelayTeam < ActiveRecord::Base
   def adjustment(leg=nil)
     leg = relay.legs_count unless leg
     sum = 0
-    relay_competitors.each do |competitor|
-      sum += competitor.adjustment.to_i if competitor.leg <= leg
+    leg.times do |i|
+      competitor = competitor(i + 1)
+      sum += competitor.adjustment.to_i if competitor
     end
     sum
   end
